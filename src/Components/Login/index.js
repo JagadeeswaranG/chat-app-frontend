@@ -5,64 +5,61 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [userCred, setUserCred] = useState({ email: "", password: "" });
   const navigate = useNavigate();
-
   const handleCred = (value) => {
     return setUserCred((cred) => {
       return { ...cred, ...value };
     });
   };
 
-  useEffect(() => {
-    console.log(userCred);
-  }, [userCred]);
-
   const handleLogin = async (event) => {
     try {
       event.preventDefault();
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/user/signin`,
-        { ...userCred },
+        userCred,
         { withCredentials: true }
       );
-      if(response){
-        navigate('/chat');
+      if (response) {
+        navigate("/");
       }
-      console.log(response);
     } catch (error) {
-      console.log(error);
+      console.log("Error: ", error);
     }
   };
 
   return (
     <div>
+      <h3>User Login</h3>
       <form onSubmit={handleLogin}>
         <div className="form-group">
-          <label for="exampleInputEmail1">Email address</label>
+          <label>Email address</label>
           <input
             type="email"
-            value={userCred.email}
-            onChange={(e) => handleCred({ email: e.target.value })}
             className="form-control"
-            id="exampleInputEmail1"
-            aria-describedby="emailHelp"
+            id="email"
+            value={userCred.email}
             placeholder="Enter email"
+            onChange={(e) => handleCred({ email: e.target.value })}
           />
         </div>
         <div className="form-group">
-          <label for="exampleInputPassword1">Password</label>
+          <label>Password</label>
           <input
             type="password"
-            value={userCred.password}
-            onChange={(e) => handleCred({ password: e.target.value })}
             className="form-control"
-            id="exampleInputPassword1"
+            id="password"
+            value={userCred.password}
             placeholder="Password"
+            onChange={(e) => handleCred({ password: e.target.value })}
           />
         </div>
         <button type="submit" className="btn btn-primary">
-          Submit
+          Login
         </button>
       </form>
+      <div>
+        <a href="/forgotPassword">Forgot password?</a>
+      </div>
     </div>
   );
 };

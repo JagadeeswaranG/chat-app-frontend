@@ -1,11 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-function Chat() {
+function Chat({socket, userName, room}) {
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
 
-  let sendMessage = () => {};
+  useEffect(() => {
+    socket.on("receive-message",data => {
+      setMessages(list => [...list, data]);
+    })
+  },[socket])
 
+  let sendMessage = async () => {
+    if(currentMessage !== ''){
+      const messageData = {
+        room: room,
+        author: userName,
+        message: currentMessage,
+        time: new Date(Date.now()).getHours()+':'+new Date(Date.now()).getMinutes()
+      }
+      console.log(messageData);
+      await socket.emit("send-message", messageData);
+      setMessages((list)=>[...list, messageData]);
+      setCurrentMessage('');
+    }
+  };
+  
   return (
     <div>
       <div className="chat-window">
@@ -14,9 +33,13 @@ function Chat() {
         </div>
         <div className="chat-body">
           <div className="message-container">
-            {messages.map((messageContent) => {
-              <div className="message" id="you">
-                <div>{messageContent}</div>
+            { messages.map((messageContent) => {
+             return <div className="message" id="you">
+                <div className="message-content">{messageContent.message}</div>
+                <div className="message-meta">
+                  <p id="time">{messageContent.time}</p>
+                  <p id="author">{messageContent.author}</p>
+                </div>
               </div>;
             })}
           </div>
